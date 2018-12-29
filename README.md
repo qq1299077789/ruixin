@@ -36,44 +36,44 @@ BeanFactory工厂类主要来管理注入的Bean，Bean的种类主要包括web�
 
 ### 1.ClassAnnotation 类注解解释
 * @Bean 普通的bean，但是不属于控制层，业务层和持久层
- * value：表示bean的唯一标识，为空则默认是类名称
- * init：初始化后默认加载方法，允许多个
+    * value：表示bean的唯一标识，为空则默认是类名称
+    * init：初始化后默认加载方法，允许多个
  
 * @Web 控制层bean
- * value：表示bean的唯一标识，为空则默认是类名称
- * preUrl：表示访问前缀
+    * value：表示bean的唯一标识，为空则默认是类名称
+    * preUrl：表示访问前缀
  
 * @Service 业务层bean
- * value：表示bean的唯一标识，为空则默认是类名称
+    * value：表示bean的唯一标识，为空则默认是类名称
  
  
 * @Dao 持久层bean(支持class interface两种类型，class类型Aop失效)
- * value：表示bean的唯一标识，为空则默认是类名称
+    * value：表示bean的唯一标识，为空则默认是类名称
 
 ### 2.FieldAnnotation 属性注解解释
 
 * @Autowire bean注入
- * value：注入的bean的唯一标志，为空则根据fieldName获取
+    * value：注入的bean的唯一标志，为空则根据fieldName获取
  
 * @Value 获取ruixin.properties配置文件的值
- * value：要获取配置文件的属性的key
+    * value：要获取配置文件的属性的key
  
 ### 3.MethodAnnotation 方法注解解释
 
 * @All 响应所有http请求
- * value：响应的链接
- * 
+    * value：响应的链接
+ 
 * @PostMapping 响应Post请求
-  * value：响应的链接
-  * 
+    * value：响应的链接
+ 
 * @GetMapping 响应Get请求
-  * value：响应的链接
+    * value：响应的链接
   
 * @PutMapping 响应Put请求
-  * value：响应的链接
+    * value：响应的链接
   
 * @DeleteMapping 响应Delete请求
-  * value：响应的链接
+    * value：响应的链接
   
 * @JsonReturn 返回json数据
 
@@ -162,46 +162,46 @@ ModelMap类是模仿Springmvc的ModelAndView类，内置HttpServletRequest对象
 事务处理主要用的是@Transaction注解，允许作用于类或者方法上，作用于类上表示对该类所有的方法加上事务，作用于方法上表示只对这一个方法加事务。
 ### 1.注解
 * @Transaction 事务注解，为此类所有方法加上事务
- * readOnly：是否只读
- * level：事务级别
+    * readOnly：是否只读
+    * level：事务级别
  
 ## 十一、缓存
 系统内置DefaultCache缓存，也已经把CacheManager注册为bean，可以通过@Autowire注解获取CacheManager对象，手动生成Cache。也可以通过@Autowire注解获取系统默认缓存DefaultCache对象。
 ## 十二、持久层
 ### 1.主要的注解
 * @Insert 执行新增语句 
- * value：属性值为SQL语句
- * sql：与value等价，属性值是SQL语句
- * returnType：返回值类型
- * useGeneratedKeys：是否是自增主键
- * keyProperty：主键属性名
+    * value：属性值为SQL语句
+    * sql：与value等价，属性值是SQL语句
+    * returnType：返回值类型
+    * useGeneratedKeys：是否是自增主键
+    * keyProperty：主键属性名
  
 * @Select 执行查询语句
- * value：属性值为SQL语句
- * sql：与value等价，属性值是SQL语句
- * returnType：返回值类型
+    * value：属性值为SQL语句
+    * sql：与value等价，属性值是SQL语句
+    * returnType：返回值类型
  
 * @Update 执行更新语句
- * value：属性值为SQL语句
- * sql：与value等价，属性值是SQL语句
+    * value：属性值为SQL语句
+    * sql：与value等价，属性值是SQL语句
  
 * @Delete 执行删除语句
- * value：属性值为SQL语句
- * sql：与value等价，属性值是SQL语句
+    * value：属性值为SQL语句
+    * sql：与value等价，属性值是SQL语句
  
 * @QueryProvider 执行动态语句
- * type：动态语句操作类
- * method：动态语句操作类的方法
- * queryType：QueryType.SELECT、QueryType.INSERT、QueryType.UPDATE、QueryType.DELETE分别表示动态sql的类型
- * returnType：返回类型
- * useGeneratedKeys：主键是否自增
+    * type：动态语句操作类
+    * method：动态语句操作类的方法
+    * queryType：QueryType.SELECT、QueryType.INSERT、QueryType.UPDATE、QueryType.DELETE分别表示动态sql的类型
+    * returnType：返回类型
+    * useGeneratedKeys：主键是否自增
  
 * @SelectKey 在执行增删改查操作时，执行其他操作
- * statement：sql语句
- * resultType：返回类型
- * order：Order.BEFORE、Order.AFTER表示在sql执行前还是执行后执行selectKey中的SQL
- * keyProperty：对象属性注入名称
+    * statement：sql语句
+    * resultType：返回类型
+    * order：Order.BEFORE、Order.AFTER表示在sql执行前还是执行后执行selectKey中的SQL
+    * keyProperty：对象属性注入名称
  
 * @Param 持久层属性值映射
- * value：属性值标识
+    * value：属性值标识
 
