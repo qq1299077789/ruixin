@@ -60,7 +60,7 @@ BeanFactory工厂类主要来管理注入的Bean，Bean的种类主要包括web�
  
 ### 3.MethodAnnotation 方法注解解释
 
-* @All 响应所有http请求
+* @Request 响应所有http请求
     * value：响应的链接
  
 * @PostMapping 响应Post请求
@@ -157,7 +157,16 @@ ModelMap类是模仿Springmvc的ModelAndView类，内置HttpServletRequest对象
 如果handler没有@JsonReturn注解，且返回类型是String或者ModelMap，则默认handler返回是视图层数据，反之则返回的是Json数据。
 
 ## 九、Restful
-
+Restful主要用占位符$表示，比如：
+```java
+//需要匹配 /a/b/c中的b
+//Controller中
+@GetMapping("/a/$b/c")
+public String test(@PathVariable("b")int b){
+    //逻辑代码
+}
+//即可匹配
+```
 ## 十、事务处理
 事务处理主要用的是@Transaction注解，允许作用于类或者方法上，作用于类上表示对该类所有的方法加上事务，作用于方法上表示只对这一个方法加事务。
 ### 1.注解
