@@ -25,14 +25,18 @@ public class HandlerMethod {
 	private HttpServletResponse response;
 	private Map<String,String[]> args;//前台传过来的参数
 	private boolean isJsonData=false;//是否是JSON数据
+	private String mappingUrl;//mapping注解的url
+	private String requestUrl;//request请求的url
 	
-	public HandlerMethod(HttpServletRequest request,HttpServletResponse response,Object bean,Method method) {
+	public HandlerMethod(HttpServletRequest request,HttpServletResponse response,Object bean,Method method,String mappingUrl,String requestUrl) {
 		this.request=request;
 		this.response=response;
 		this.method=method;
 		this.bean=bean;	
 		this.args=request.getParameterMap();
 		this.isJsonData=AnnoUtil.instance.hasAnnotations(method,JsonReturn.class);
+		this.mappingUrl=mappingUrl;
+		this.requestUrl=requestUrl;
 	}
 	
 	/**
@@ -71,7 +75,10 @@ public class HandlerMethod {
 			}
 			//设置其他的接收参数
 		}
+		//设置 Args注解参数
 		AnnotationConfig.instance.parseArgs(method, parameters, args);
+		//设置 PathVariable注解参数
+		AnnotationConfig.instance.parsePathVariable(method, parameters,mappingUrl,requestUrl);
 		return parameters;
 	}
 	

@@ -1,9 +1,13 @@
 package com.ruixin.config;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import com.ruixin.util.UrlUtil;
 
 /**
  * @Author:ruixin
@@ -19,13 +23,14 @@ public class HandlerMapping {
 	private Map<Object,Map<String,Method>> putMapping=new HashMap<Object,Map<String,Method>>();
 	private Map<Object,Map<String,Method>> deleteMapping=new HashMap<Object,Map<String,Method>>();
 	private Map<Object,Map<String,Method>> allMapping=new HashMap<Object,Map<String,Method>>();
-	private String httpTypeGet="GET";
-	private String httpTypePost="POST";
-	private String httpTypePut="PUT";
-	private String httpTypeDelete="DELETE";
-	private String httpTypeAll="ALL";
+	public String httpTypeGet="GET";
+	public String httpTypePost="POST";
+	public String httpTypePut="PUT";
+	public String httpTypeDelete="DELETE";
+	public String httpTypeAll="ALL";
 	public String Key_Web="Web";
 	public String Key_Method="Method";
+	public String Key_Url="Url";
 	
 	/**
 	 * @param web
@@ -69,12 +74,15 @@ public class HandlerMapping {
 	 * @param httpType
 	 * @param uri
 	 * @return
-	 * @Description:通过请求类型和
+	 * @Description:通过请求类型和请求链接查询mapping
 	 */
 	public Map<String,Object> getMapping(String httpType,String uri){
 		Map<Object, Map<String, Method>> container = getMappingContainer(httpType);
+		Map<String,Integer> urlPattern=new HashMap<>();
 		Map<String,Map<String,Object>> results=new HashMap<>();
 		Map<String,Object> result=null;
+		int maxUrlPatternIndex=-1;//最大精准匹配系数
+		
 		//首先通过请求类型搜索
 		for(Entry<Object,Map<String,Method>> entry:container.entrySet()){
 			Object web=entry.getKey();
@@ -83,10 +91,20 @@ public class HandlerMapping {
 				String url=entry1.getKey();
 				Method method=entry1.getValue();
 				//url优先级映射
-				if(uri.startsWith(url)){
+				int urlPatternIndex = UrlUtil.urlPattern(uri, url);
+				if(urlPatternIndex==UrlUtil.EQ){ //精准匹配直接返回
 					result=new HashMap<>();
 					result.put(Key_Web, web);
 					result.put(Key_Method,method);
+					result.put(Key_Url, url);
+					return result;
+				}else if(urlPatternIndex!=-1&&urlPatternIndex>maxUrlPatternIndex){
+					maxUrlPatternIndex=urlPatternIndex;
+					urlPattern.put(url,urlPatternIndex);
+					result=new HashMap<>();
+					result.put(Key_Web, web);
+					result.put(Key_Method, method);
+					result.put(Key_Url, url);
 					results.put(url, result);
 				}
 			}
@@ -100,15 +118,26 @@ public class HandlerMapping {
 				String url=entry1.getKey();
 				Method method=entry1.getValue();
 				//url优先级映射
-				if(uri.startsWith(url)){
+				int urlPatternIndex = UrlUtil.urlPattern(uri, url);
+				if(urlPatternIndex==UrlUtil.EQ){ //精准匹配直接返回
 					result=new HashMap<>();
 					result.put(Key_Web, web);
 					result.put(Key_Method,method);
+					result.put(Key_Url, url);
+					return result;
+				}else if(urlPatternIndex!=-1&&urlPatternIndex>maxUrlPatternIndex){
+					maxUrlPatternIndex=urlPatternIndex;
+					urlPattern.put(url,urlPatternIndex);
+					result=new HashMap<>();
+					result.put(Key_Web, web);
+					result.put(Key_Method, method);
+					result.put(Key_Url, url);
 					results.put(url, result);
 				}
 			}
 		}
-		return getMapping(results);
+		String baseUrl=getMapping(urlPattern,maxUrlPatternIndex);
+		return results.get(baseUrl);
 	}
 	
 	/**
@@ -116,13 +145,24 @@ public class HandlerMapping {
 	 * @return
 	 * @Description:获取最优匹配
 	 */
-	public Map<String,Object> getMapping(Map<String,Map<String,Object>> results){
-		String uri="";
-		for(Entry<String, Map<String,Object>> entry:results.entrySet()){
-			if(entry.getKey().length()>uri.length()){
-				uri=entry.getKey();
+	public String getMapping(Map<String,Integer> results,int maxUrlPatternIndex){
+		Map<String,Integer> map = new HashMap<>();
+		List<String> urls=new ArrayList<>(); //防止出现多个匹配系数一致的情况
+		for(Entry<String,Integer> entry:results.entrySet()){
+			String url=entry.getKey();
+			Integer urlPattern=entry.getValue();
+			if(urlPattern==maxUrlPatternIndex){
+				urls.add(url);
 			}
 		}
-		return results.get(uri);
+		if(urls.size()==1){
+			return urls.get(0);
+		}else if(urls.size()>1){ //多个匹配系数一致
+			
+			return null;
+		}else{
+			return null;
+		}
 	}
+	
 }

@@ -38,7 +38,8 @@ public class HandlerAdaptor {
 		}else{
 			Object web=mapping.get(HandlerMapping.instance.Key_Web);
 			Method method=(Method) mapping.get(HandlerMapping.instance.Key_Method);
-			handlerMethod=new HandlerMethod(request, response, web, method);
+			String url=(String) mapping.get(HandlerMapping.instance.Key_Url);
+			handlerMethod=new HandlerMethod(request, response, web, method,url,httpUri);
 			return handlerMethod.invok();
 		}
 	}

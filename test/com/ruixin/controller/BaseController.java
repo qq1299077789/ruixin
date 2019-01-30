@@ -2,11 +2,12 @@ package com.ruixin.controller;
 
 import java.util.List;
 
-import com.ruixin.annotation.All;
+import com.ruixin.annotation.RequestMapping;
 import com.ruixin.annotation.Args;
 import com.ruixin.annotation.Autowired;
 import com.ruixin.annotation.GetMapping;
 import com.ruixin.annotation.JsonReturn;
+import com.ruixin.annotation.PathVariable;
 import com.ruixin.annotation.Web;
 import com.ruixin.config.ModelMap;
 import com.ruixin.po.User;
@@ -79,14 +80,21 @@ public class BaseController {
 	}
 	
 	
-	@All("/test1")
+	@RequestMapping("/test1")
 	public String test(){
 		return "test";
 	}
 	
-	@All("/test12")
+	@RequestMapping("/test12")
 	public ModelMap test3(ModelMap map){
 		map.setView("test");
+		return map;
+	}
+	
+	@GetMapping("/test12/$id")
+	public ModelMap test2(ModelMap map,@PathVariable("id")int id){
+		map.setView("test");
+		System.err.println("id:"+id);
 		return map;
 	}
 }
