@@ -60,7 +60,7 @@ BeanFactory工厂类主要来管理注入的Bean，Bean的种类主要包括web�
  
 ### 3.MethodAnnotation 方法注解解释
 
-* @Request 响应所有http请求
+* @RequestMapping 响应所有http请求
     * value：响应的链接
  
 * @PostMapping 响应Post请求
