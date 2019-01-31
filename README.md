@@ -213,4 +213,224 @@ public String test(@PathVariable("b")int b){
  
 * @Param 持久层属性值映射
     * value：属性值标识
+## 十三、操作案例
+### 1.Controller基本操作
+Controller层必须加上@Web注解，否则无效。@Web中preUrl属性表示访问前缀。
+* 基本的跳转：
+```java
+//跳转到 /WEB-INF/jsp/test.jsp
+@GetMapping("/test1")
+public String test(){
+    return "test";
+}
+
+//通过ModelMap跳转
+@GetMapping("/test12")
+public ModelMap test(ModelMap map){
+    map.setView("test");
+	return map;
+}
+
+//forward跳转
+@GetMapping("/test123")
+public String test(){
+    return "forward:test";
+}
+
+//redirect跳转
+@GetMapping("/test1234")
+public String test(){
+    return "redirect:test1";
+}
+```
+* 返回JSON格式数据
+``` java
+@GetMapping("/json")
+@JsonReturn
+public  String test(){
+    return "JSON数据";
+}
+```
+* 接收前端传值
+```java
+//通过@Args接收
+@PostMapping("/insert")
+@JsonReturn
+public User insert(@Args("name")String name,@Args("sex")String sex){
+	User user=new User();
+	user.setName(name);
+	user.setSex(sex);
+	return user;
+}
+
+//通过HttpServletRequest对象接收
+@PostMapping("/insert")
+@JsonReturn
+public User insert(HttpServletRequest request){
+    String name = request.getParameter("name");
+	String sex = request.getParameter("sex");
+    User user=new User();
+	user.setName(name);
+	user.setSex(sex);
+	return user;
+}
+```
+* 向前端传值
+```java
+//通过ModelMap传值
+@GetMapping("/ModelMap")
+public String test(ModelMap map){
+    map.setView("test");
+    map.addParam("test", "ruixin");
+    return map;
+}
+
+//通过HttpServletRequest传值
+@GetMapping("/request")
+public String test(HttpServletRequest request){
+    request.setAttribute("test","ruixin");
+    return "test";
+}
+```
+* Restful
+```java
+@GetMapping("/test12/$id")
+public ModelMap test2(ModelMap map,@PathVariable("id")int id){		    map.setView("test");
+	System.err.println("id:"+id);
+	return map;
+}
+```
+* 文件上传(支持多文件上传)
+```java
+@PostMapping("/upload")
+@JsonReturn
+public List<String> upload(MultipartFile multipartFile) throws Throwable{
+    //重命名多文件上传,返回值是文件路径
+    List<String> filesPath = multipartFile.upload(false);
+    //保持原名称多文件上传
+    List<String> filesPath1 = multipartFile.upload(true);
+    return filesPath;
+}
+```
+* 注入bean
+```java
+@Autowired
+private BaseService baseService;
+```
+* 获取配置文件的值
+```java
+@Value("file.uploadPath")
+private String uploadPath;
+```
+### 2.Service基本操作
+Service层必须加上@Service注解，否则无效。
+* Bean注入
+```java
+@Autowired
+private BaseDAO baseDAO;
+```
+* 事务
+```java
+//类上添加@Transaction，表示给所有的方法添加事务
+@Service
+@Transaction(readOnly=true)
+public class BaseService{
+
+}
+
+//方法上添加@Transaction，表示给当前方法添加事务，如果类上也有@Transaction注解，会覆盖类上的注解
+@Transaction(readOnly=false)
+public int insert(User user){
+    return baseDAO.insert(user);
+}
+```
+* ehcache缓存
+```java
+@Autowired
+private DefaultCache defaultCache; //默认缓存
+
+@Transaction(readOnly=true)
+public User findUserById(int id) {
+    User user=baseDAO.findUserById(id);
+    defaultCache.put("user", user);
+    return user;
+}
+```
+
+### 3.Dao基本操作
+Dao层必须加上@Dao注解，否则无效。
+
+* @Insert注解，useGeneratedKeys值为true表示自增主键，增加后会自动把id注入到对应字段
+```java
+@Insert(sql="insert into User(name,sex,role) value(#{user.name},#{user.sex},#{user.role})",useGeneratedKeys=true)
+public int insert(@Param("user")User user);
+```
+
+* @Delete注解
+```java
+@Delete("delete from User where id=#{id}")
+public void delete(@Param("id") int id);
+```
+
+* @Update注解
+```java
+@Update("update User set name = #{user.name} where id = #{user.id}")
+public void update(@Param("user")User user);
+```
+
+* @Select注解
+```java
+@Select(sql="select * from User", returnType = User.class)
+public List<User> findAll();
+
+@Select(sql="select * from User where id=#{id}", returnType = User.class)
+public User findUserById(@Param("id")int id);
+```
+
+* 动态SQL:@QueryProvider注解
+```java
+//BaseDao.java
+@QueryProvider(type=UserProvider.class,method="select",queryType=QueryType.SELECT,returnType=User.class)
+	public User findUserById1(@Param("id") int id);
+
+//UserProvider.java
+public String select(int id){
+    return new SQL().select("*").from("User").where("id=#{id}").toSQL();
+}
+```
+
+* 简单的分页操作,PageHelper工具类
+```java
+public List<User> findAll(){
+    PageHelper.limit(10);
+	List<User> findAll = baseDAO.findAll();
+    LoggerUtils.debug("PageHelper测试:"+PageHelper.getPageCount());
+	return findAll;
+}	
+```
+### 4.工具Bean，以DefaultCache为例
+增加类注解@Bean(init={"init"}),init属性表示创建bean时自动调用的方法，以便初始化某些操作。
+
+### 5.Handler监听
+继承HandlerListener接口实现before和after方法，便可以在每次调用Handler前后监听Handler执行前和执行后的。
+
+## 十四、说明
+
+### 1.引用的jar
+
+* slf4j-api-1.7.7.jar
+* ehcache-3.6.2.jar
+* cglib-3.2.10.jar
+* asm-7.0.jar
+
+### 2.测试文件
+测试文件已上传至test目录下
+
+## 十五、后期bug
+如果使用过程中遇到bug，请及时提交变更，或者及时联系本人，我将尽快修复。
+
+* 联系方式：
+    * QQ: 1299077789 (请备注来意)
+    * QQ群: 296588610、209451266
+
 
