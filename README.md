@@ -403,9 +403,9 @@ public String select(int id){
 ```java
 public List<User> findAll(){
     PageHelper.limit(10);
-	List<User> findAll = baseDAO.findAll();
+    List<User> findAll = baseDAO.findAll();
     LoggerUtils.debug("PageHelper测试:"+PageHelper.getPageCount());
-	return findAll;
+    return findAll;
 }	
 ```
 ### 4.工具Bean，以DefaultCache为例
